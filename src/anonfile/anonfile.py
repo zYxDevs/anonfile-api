@@ -137,11 +137,11 @@ class ParseResponse:
         return self.json['data']['file']['metadata']['id']
 
     @property
-    def name(self) -> Path:
+    def name(self) -> str:
         """
-        Return the filename of the uploaded file.
+        Return the child of the URL path.
         """
-        return Path(self.json['data']['file']['metadata']['name'])
+        return self.json['data']['file']['metadata']['name']
 
     @property
     def size(self) -> int:
