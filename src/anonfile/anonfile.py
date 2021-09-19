@@ -32,11 +32,14 @@ import os
 import platform
 import re
 import sys
+import tarfile
 from dataclasses import dataclass
+from enum import Enum, unique
 from pathlib import Path
 from typing import List, Tuple, Union
 from urllib.parse import ParseResult, urljoin, urlparse
 from urllib.request import getproxies
+from zipfile import ZIP_DEFLATED, ZipFile
 
 import requests
 from requests import Session
@@ -85,7 +88,67 @@ file_handler = logging.FileHandler(get_logfile_path())
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-#endregion
+#endregion logging
+
+#region utils
+
+@unique
+class Extension(Enum):
+    """
+    Defines available archive extensions for utility methods.
+    """
+    ZIP = '.zip'
+    TARGZ = '.tar.gz'
+
+
+def archive(folder: Union[str, Path], ext: Extension) -> None:
+    """
+    Archive `folder` as `ZipFile` or `TarFile` using the highest compression levels
+    available.
+
+    Example
+    -------
+    ```
+    from anonfile import archive, Extension
+
+    # make a new archive
+    archive(Path('pictures'), Extension.TARGZ)
+    ```
+    """
+    if ext == Extension.ZIP:
+        with ZipFile(f"{folder}.zip", mode='w', compression=ZIP_DEFLATED, compresslevel=9) as zip_handler:
+            for file in Path(folder).glob('**/*'):
+                zip_handler.write(file)
+    elif ext == Extension.TARGZ:
+        with tarfile.open(f"{folder}.tar.gz", mode='x:gz') as tar_handler:
+            tar_handler.add(folder)
+    else:
+        raise NotImplementedError(f"{ext.value} is not an supported archive.")
+
+def extract(path: Union[str, Path], ext: Extension, target_dir: Union[str, Path]=Path.cwd()) -> None:
+    """
+    Decompress an archive located in `path` and extract all its files into `target_dir`.
+    Warning: Never extract archives from untrusted sources without prior inspection.
+
+    Example
+    -------
+    ```
+    from anonfile import Extension, extract
+
+    # decrompress a tarball file
+    extract(Path('pictures.tar.gz'), Extension.TARGZ)
+    ```
+    """
+    if ext == Extension.ZIP:
+        with ZipFile(path) as zip_handler:
+            zip_handler.extractall(target_dir)
+    elif ext == Extension.TARGZ:
+        with tarfile.open(path) as tar_handler:
+            tar_handler.extractall(target_dir)
+    else:
+        raise NotImplementedError(f"{ext.value} is not an supported archive.")
+
+#endregion utils
 
 @dataclass(frozen=True)
 class ParseResponse:
