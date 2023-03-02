@@ -4,10 +4,10 @@ from setuptools import find_packages, setup
 
 with open("src/anonfile/anonfile.py", encoding='utf-8') as file_handler:
     lines = file_handler.read()
-    version = re.search(r'__version__ = "(.*?)"', lines).group(1)
-    package_name = re.search(r'package_name = "(.*?)"', lines).group(1)
-    python_major = int(re.search(r'python_major = "(.*?)"', lines).group(1))
-    python_minor = int(re.search(r'python_minor = "(.*?)"', lines).group(1))
+    version = re.search(r'__version__ = "(.*?)"', lines)[1]
+    package_name = re.search(r'package_name = "(.*?)"', lines)[1]
+    python_major = int(re.search(r'python_major = "(.*?)"', lines)[1])
+    python_minor = int(re.search(r'python_minor = "(.*?)"', lines)[1])
 
 print("reading dependency file")
 
@@ -34,18 +34,15 @@ setup(
     project_urls={
         'Source Code': "https://github.com/nstrydom2/anonfile-api",
         'Bug Reports': "https://github.com/nstrydom2/anonfile-api/issues",
-        'Changelog': "https://github.com/nstrydom2/anonfile-api/blob/master/CHANGELOG.md"
-    },    
+        'Changelog': "https://github.com/nstrydom2/anonfile-api/blob/master/CHANGELOG.md",
+    },
     python_requires=">=%d.%d" % (python_major, python_minor),
     install_requires=packages,
-    extra_requires={
-        'dev': dev_packages[1:],
-        'test': ['pytest']
-    },
+    extra_requires={'dev': dev_packages[1:], 'test': ['pytest']},
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
     entry_points={
-        'console_scripts': ['%s=%s.__init__:main' % (package_name, package_name)]
+        'console_scripts': [f'{package_name}={package_name}.__init__:main']
     },
     classifiers=[
         "Programming Language :: Python :: 3.7",
@@ -59,7 +56,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    keywords="anonfile rest api"
+    keywords="anonfile rest api",
 )
 
 wheel_name = package_name.replace('-', '_') if '-' in package_name else package_name
