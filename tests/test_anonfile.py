@@ -92,11 +92,17 @@ class TestAnonFileCLI(unittest.TestCase):
         cls.logfile = get_logfile_path()
 
     def test_cli_download(self):
-        call = subprocess.call("anonfile --verbose download --url %s --no-check" % self.test_url, shell=True)
+        call = subprocess.call(
+            f"anonfile --verbose download --url {self.test_url} --no-check",
+            shell=True,
+        )
         self.assertFalse(call, msg=f"Download failed for: {self.test_url!r}")
 
     def test_cli_batch_download(self):
-        call = subprocess.call("anonfile --verbose --logging download --batch-file %s --no-check" % self.batch_file, shell=True)
+        call = subprocess.call(
+            f"anonfile --verbose --logging download --batch-file {self.batch_file} --no-check",
+            shell=True,
+        )
         self.assertFalse(call, msg=f"Download failed for: {str(self.batch_file)!r}")
 
     def test_cli_log(self):
